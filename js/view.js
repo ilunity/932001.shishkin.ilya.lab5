@@ -2,32 +2,38 @@
 
 
 export class NewsModal extends HTMLDivElement {
-  constructor( { title, content } ) {
+  #contentWrapper;
+  #titleElem;
+  #contentElem;
+
+  constructor( props ) {
     super();
 
     this.className = 'news-modal';
     this.addEventListener('click', this.hideModal);
 
-    this.wrapper = document.createElement('div');
-    this.wrapper.className = 'news-modal__wrapper';
-    this.wrapper.addEventListener('click', event => event.stopPropagation());
-    this.append(this.wrapper);
-
-    this.titleElem = document.createElement('h1');
-    this.titleElem.className = 'news-modal__title';
-    this.titleElem.innerText = title;
-    this.wrapper.append(this.titleElem);
-
-    this.contentElem = document.createElement('div');
-    this.contentElem.className = 'news-modal__content';
-    this.contentElem.innerText = `${title}: ${content}`;
-    this.wrapper.append(this.contentElem);
-
-
+    this.#createContent(props);
     document.body.append(this);
 
     this.showModal = this.showModal.bind(this);
     this.hideModal = this.hideModal.bind(this);
+  }
+
+  #createContent( { title, content } ) {
+    this.#contentWrapper = document.createElement('div');
+    this.#contentWrapper.className = 'news-modal__content-wrapper';
+    this.#contentWrapper.addEventListener('click', event => event.stopPropagation());
+    this.append(this.#contentWrapper);
+
+    this.#titleElem = document.createElement('h1');
+    this.#titleElem.className = 'news-modal__title';
+    this.#titleElem.innerText = title;
+    this.#contentWrapper.append(this.#titleElem);
+
+    this.#contentElem = document.createElement('div');
+    this.#contentElem.className = 'news-modal__content';
+    this.#contentElem.innerText = `${title}: ${content}`;
+    this.#contentWrapper.append(this.#contentElem);
   }
 
   showModal() {
@@ -38,33 +44,42 @@ export class NewsModal extends HTMLDivElement {
     this.classList.remove('news-modal_active');
   }
 }
+
 customElements.define('news-modal', NewsModal, { extends: 'div' });
 
 
 export class NewsElem extends HTMLDivElement {
+  #modal;
+  #titleElem;
+  #previewElem;
+  #showModalButton;
+
   constructor( { title, preview, content } ) {
     super();
 
-    this.modal = new NewsModal({ title, content });
-
     this.className = 'news-elem';
+    this.#modal = new NewsModal({ title, content });
 
-    const titleElem = document.createElement('h2');
-    titleElem.className = 'news-elem__title';
-    titleElem.innerText = title;
+    this.#createContent({ title, preview });
+  }
 
-    const previewElem = document.createElement('div');
-    previewElem.className = 'news-elem__preview';
-    previewElem.innerText = preview;
+  #createContent( { title, preview } ) {
+    this.#titleElem = document.createElement('h2');
+    this.#titleElem.className = 'news-elem__title';
+    this.#titleElem.innerText = title;
+    this.append(this.#titleElem);
 
-    const showModalButton = document.createElement('button');
-    showModalButton.className = 'news-elem__button';
-    showModalButton.innerText = 'Открыть всплывающее окно';
-    showModalButton.addEventListener('click', this.modal.showModal);
+    this.#previewElem = document.createElement('div');
+    this.#previewElem.className = 'news-elem__preview';
+    this.#previewElem.innerText = preview;
+    this.append(this.#previewElem);
 
-    this.append(titleElem);
-    this.append(previewElem);
-    this.append(showModalButton);
+    this.#showModalButton = document.createElement('button');
+    this.#showModalButton.className = 'news-elem__button';
+    this.#showModalButton.innerText = 'Открыть всплывающее окно';
+    this.#showModalButton.addEventListener('click', this.#modal.showModal);
+    this.append(this.#showModalButton);
   }
 }
+
 customElements.define('news-elem', NewsElem, { extends: 'div' });
